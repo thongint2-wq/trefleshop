@@ -1,13 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { pageGraph, pageLabels, pageMenu, pagePaths } from "../graph";
+import { pageGraph, pageLabels, pagePaths } from "../graph";
 
 // # แถบส่วนหัว แบรนด์ และลิงก์นำทาง พร้อมแสดงคำอธิบายตามหน้าปัจจุบัน
 export function SiteHeader() {
     const location = useLocation();
     const currentPage = Object.entries(pagePaths)
         .find(([, path]) => path === location.pathname)?.[0];
-    const connectedPages = new Set(pageGraph[currentPage] ?? []);
-    const menuPages = pageMenu.filter(page => connectedPages.has(page));
+    const menuPages = (pageGraph[currentPage] ?? [])
+        .filter(page => pageLabels[page]?.menuLabel);
 
     return (
         <header className="header">

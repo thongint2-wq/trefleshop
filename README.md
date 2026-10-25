@@ -92,14 +92,14 @@ src/
 
 | Node | URL | หน้าที่เชื่อมไปได้ตาม `pageGraph` |
 |---|---|---|
-| `home` | `/` | favorites, history, detail |
-| `favorites` | `/favorites.html` | home, history, detail |
-| `history` | `/history.html` | home, favorites, detail |
+| `home` | `/` | home, history, favorites, detail |
+| `favorites` | `/favorites.html` | home, history, favorites, detail |
+| `history` | `/history.html` | home, favorites, history, detail |
 | `detail` | `/plantDetail.html` | home, history, favorites |
 
 นอกจากนี้ `canReach(start, end)` ใช้ **Breadth-First Search (BFS)** ตรวจว่ามีเส้นทางจากหน้าเริ่มต้นไปหน้าปลายทางหรือไม่ และ `checkGraph()` ใช้ตรวจหน้าที่ไปไม่ถึงหรือไม่มีเส้นทางกลับหน้าแรก
 
-**ข้อควรแก้ให้ตรงข้อกำหนด Graph ของใบงาน:** ปัจจุบัน `SiteHeader` ใน `src/components/SiteLayout.jsx` ยังเขียนลิงก์เมนูเป็น `Link` แบบตายตัว ไม่ได้สร้างรายการเมนูจาก `pageGraph` ดังนั้นต้องปรับโค้ดเมนูให้สร้างจากข้อมูล Graph ก่อนนำเสนอว่าเมนูเชื่อมกับ Graph แล้ว
+เมนูส่วนหัวสร้างจาก Graph โดย `SiteHeader` อ่าน node ปัจจุบันจาก URL แล้ววน edge ที่ออกจาก node นั้นใน `pageGraph` จากนั้นเลือกเฉพาะปลายทางที่มี `menuLabel` ใน `pageLabels` และใช้ `pagePaths` กำหนด URL ของ `<Link>` ดังนั้นการเพิ่ม/ถอด edge หรือกำหนด node ให้เป็นเมนูทำที่ข้อมูล Graph ได้ โดยไม่ต้องเขียน `<Link>` แยกรายการใน JSX ทั้งนี้ `pageGraph` เก็บลำดับการแสดงเมนูตามลำดับ edge ของแต่ละ node
 
 ## 7. DSA ที่ใช้กับข้อมูลจริง
 
@@ -204,11 +204,3 @@ HomePage (ถือ state และจัดการค้นหา)
 - `HomeHero` รับ `query` และ callback สำหรับแจ้งการพิมพ์ ค้นหา และล้างคำค้น
 - `PlantSearchSection` รับผลค้นหาและสถานะ แล้วเลือกแสดง Loading, Error, Empty หรือรายการการ์ด
 - `PlantCard` รับข้อมูลต้นไม้ผ่าน `plant` และเรียก `onOpenDetails` เมื่อผู้ใช้เปิดรายละเอียด
-
-## 13. รายการตรวจสอบก่อนส่ง
-
-- [ ] ใส่ภาพ Before และ After จริงจากงานแรกและงานปัจจุบัน
-- [ ] ตรวจสอบชื่อ รหัสนักศึกษา งานที่รับผิดชอบ และช่วงเวลานำเสนอให้ตรงกับ commit history
-- [ ] ปรับ `SiteHeader` ให้สร้างเมนูจาก `pageGraph` ตามข้อกำหนด Graph.js ของใบงาน
-- [ ] ทดลองให้ครบทั้ง loading, empty, error และ success รวมถึงกรณี API error
-- [ ] ตรวจสอบว่า README และคลิปอธิบาย state, effect, props/callback, Graph และ Big-O จากโค้ดจริง
