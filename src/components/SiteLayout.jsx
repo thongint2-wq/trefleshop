@@ -1,8 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { pageGraph, pageLabels, pageMenu, pagePaths } from "../graph";
 
 // # แถบส่วนหัว แบรนด์ และลิงก์นำทาง พร้อมแสดงคำอธิบายตามหน้าปัจจุบัน
 export function SiteHeader() {
     const location = useLocation();
+    const currentPage = Object.entries(pagePaths)
+        .find(([, path]) => path === location.pathname)?.[0];
+    const connectedPages = new Set(pageGraph[currentPage] ?? []);
+    const menuPages = pageMenu.filter(page => connectedPages.has(page));
 
     return (
         <header className="header">
@@ -22,22 +27,18 @@ export function SiteHeader() {
                         </span>
                     </div>
                 </Link>
-                {/* # จุดเชื่อมจากทุกหน้า: แบรนด์ไปหน้าแรก และเมนูไปหน้าประวัติหรือรายการโปรด */}
+                {/* # สร้างเมนูจาก node/edge ใน graph.js โดยใช้ path และ label ของ node */}
                 <nav className="nav-actions" aria-label="Main navigation">
-                    <Link
-                        to="/history.html"
-                        className="favorites-link"
-                        aria-current={location.pathname === "/history.html" ? "page" : undefined}
-                    >
-                        🕘 Viewing history
-                    </Link>
-                    <Link
-                        to="/favorites.html"
-                        className="favorites-link"
-                        aria-current={location.pathname === "/favorites.html" ? "page" : undefined}
-                    >
-                        ❤️ Favorites
-                    </Link>
+                    {menuPages.map(page => (
+                        <Link
+                            key={page}
+                            to={pagePaths[page]}
+                            className="favorites-link"
+                            aria-current={currentPage === page ? "page" : undefined}
+                        >
+                            {pageLabels[page].menuLabel}
+                        </Link>
+                    ))}
                 </nav>
             </div>
         </header>

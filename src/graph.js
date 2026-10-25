@@ -1,9 +1,9 @@
 // # แผนภาพทิศทางของหน้าต่าง ๆ ที่กำหนดไว้ใน React Router
 // # แต่ละเส้นเชื่อมแทนลิงก์หรือการย้อนกลับที่มีอยู่ในคอมโพเนนต์
 export const pageGraph = {
-    home: ["favorites", "history", "detail"],
-    favorites: ["home", "history", "detail"],
-    history: ["home", "favorites", "detail"],
+    home: ["home", "favorites", "history", "detail"],
+    favorites: ["home", "favorites", "history", "detail"],
+    history: ["home", "favorites", "history", "detail"],
     detail: ["home", "history", "favorites"],
 };
 
@@ -14,6 +14,15 @@ export const pagePaths = {
     history: "/history.html",
     detail: "/plantDetail.html",
 };
+
+// # ข้อมูลแสดงผลของแต่ละ node; เฉพาะ history และ favorites เป็นเมนูส่วนหัว
+export const pageLabels = {
+    favorites: { menuLabel: "❤️ Favorites" },
+    history: { menuLabel: "🕘 Viewing history" },
+};
+
+// # เรียงรายการเมนูส่วนหัวตามลำดับที่ต้องการแสดง โดย edge ใน pageGraph เป็นตัวกำหนดหน้าที่เชื่อมถึงได้
+export const pageMenu = ["history", "favorites"];
 
 // # ตรวจสอบด้วย BFS ว่าสามารถเดินทางจากหน้าเริ่มต้นไปยังหน้าปลายทางได้หรือไม่
 export function canReach(start, end, graph = pageGraph) {
