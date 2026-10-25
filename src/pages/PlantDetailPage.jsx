@@ -19,13 +19,14 @@ export default function PlantDetailPage() {
     useEffect(() => {
         document.title = "Plant Detail | Trefle Plant Shop";
         let active = true;
+        setPlant(null);
+        setLoading(true);
+        setError(false);
 
         if (!slug) {
             setError(true);
             setLoading(false);
-            return () => {
-                active = false;
-            };
+            return () => { active = false; };
         }
 
         getPlant(slug)

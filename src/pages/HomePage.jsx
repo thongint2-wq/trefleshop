@@ -36,7 +36,10 @@ export default function HomePage() {
 
         getRecommendations()
             .then(result => {
-                if (active) setRecommendations(result.data || []);
+                if (!Array.isArray(result.data)) {
+                    throw new Error("Recommendations returned invalid data.");
+                }
+                if (active) setRecommendations(result.data);
             })
             .catch(error => {
                 console.error("Flower Recommendations Error:", error);
@@ -62,6 +65,7 @@ export default function HomePage() {
         if (!searchQuery) {
             setPlants(null);
             setSearchLoading(false);
+            clearSearchState();
             return;
         }
 
@@ -129,7 +133,6 @@ export default function HomePage() {
                     plants={recommendations}
                     loading={recommendationsLoading}
                     error={recommendationsError}
-                    onOpenDetails={openDetails}
                 />
             )}
             <PlantSearchSection

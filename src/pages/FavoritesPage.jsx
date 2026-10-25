@@ -17,7 +17,10 @@ export default function FavoritesPage() {
 
         getFavorites()
             .then(result => {
-                if (active) setPlants(result.data || []);
+                if (!Array.isArray(result.data)) {
+                    throw new Error("Favorites returned invalid data.");
+                }
+                if (active) setPlants(result.data);
             })
             .catch(requestError => {
                 console.error("Load Favorites Error:", requestError);

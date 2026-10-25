@@ -5,8 +5,7 @@ import ResultSection from "./ResultSection";
 export default function RecommendationsSection({
     plants,
     loading,
-    error,
-    onOpenDetails
+    error
 }) {
     return (
         <ResultSection eyebrow="FLOWER PICKS" title="Recommended Flowers">
@@ -20,7 +19,6 @@ export default function RecommendationsSection({
                             <PlantCard
                                 key={plant.slug}
                                 plant={plant}
-                                onOpenDetails={onOpenDetails}
                             />
                         ))}
         </ResultSection>

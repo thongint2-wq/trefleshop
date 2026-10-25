@@ -38,15 +38,17 @@ A plant shop project powered by the Trefle API.
 
 ```text
 src/
-  components/   Shared React UI components
-  pages/        Route-level React pages
-  services/     React API client and Express services
+  components/   Shared React UI components (cards, sections, navigation, feedback)
+  pages/        Home, favorites, history, and plant-detail page components
+  services/     Frontend API client and Express API services
   utils/        Plant sorting, browser storage, and care-data helpers
-  main.jsx      React application entry point
-  styles.css    Shared application styles
   routes/       Express API routes
-  services/     Express API services
+  main.jsx      React application entry point and route definitions
+  styles.css    Shared application styles
 ```
+
+All interactive frontend pages are rendered by React. The root `index.html` only
+provides the mount point for the React application.
 
 ## DSA
 

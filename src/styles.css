@@ -719,6 +719,11 @@ body {
 
 .secondary-button,
 .favorite-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 42px;
     border:
         none;
 
@@ -739,6 +744,10 @@ body {
 
     flex:
         1;
+
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
 }
 
 

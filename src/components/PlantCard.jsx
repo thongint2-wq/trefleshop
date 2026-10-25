@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { addFavorite, checkFavorite, removeFavorite } from "../services/plantApi";
 
 export default function PlantCard({ plant, selected = false, onRemove, onOpenDetails }) {
-    const [favorite, setFavorite] = useState(Boolean(onRemove));
+    const [favorite, setFavorite] = useState(onRemove ? true : null);
     const [saving, setSaving] = useState(false);
     const [imageFailed, setImageFailed] = useState(false);
     const [favoriteError, setFavoriteError] = useState("");
