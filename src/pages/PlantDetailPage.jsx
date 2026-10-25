@@ -7,15 +7,18 @@ import PageContainer from "../components/PageContainer";
 import { getPlant } from "../services/plantApi";
 import { recordPlantView } from "../utils/plantUtils";
 
+// # อ่าน slug จาก URL โหลดรายละเอียดต้นไม้ และแสดงหน้ารายละเอียด
 export default function PlantDetailPage() {
     const location = useLocation();
     const [plant, setPlant] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const recordedSlug = useRef(null);
+    // # รองรับพารามิเตอร์ id แบบเดิมและ slug ที่ใช้ในลิงก์ปัจจุบัน
     const slug = new URLSearchParams(location.search).get("id") ||
         new URLSearchParams(location.search).get("slug");
 
+    // # โหลดข้อมูลเมื่อ slug เปลี่ยน ตรวจสอบข้อมูล และบันทึกประวัติการดู
     useEffect(() => {
         document.title = "Plant Detail | Trefle Plant Shop";
         let active = true;

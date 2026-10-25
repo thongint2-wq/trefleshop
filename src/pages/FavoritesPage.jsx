@@ -6,11 +6,13 @@ import PageContainer from "../components/PageContainer";
 import ResultSection from "../components/ResultSection";
 import { getFavorites } from "../services/plantApi";
 
+// # โหลดและแสดงรายการโปรด พร้อมสถานะโหลด ข้อผิดพลาด และรายการว่าง
 export default function FavoritesPage() {
     const [plants, setPlants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
+    // # ดึงรายการโปรดเมื่อเปิดหน้า และป้องกันอัปเดต state หลังออกจากหน้า
     useEffect(() => {
         document.title = "Favorites | Trefle Plant Shop";
         let active = true;
@@ -35,6 +37,7 @@ export default function FavoritesPage() {
         };
     }, []);
 
+    // # เอาต้นไม้ที่ลบแล้วออกจากรายการที่แสดงทันที
     function removePlant(slug) {
         setPlants(current => current.filter(plant => plant.slug !== slug));
     }

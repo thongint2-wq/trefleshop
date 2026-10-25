@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+// # แถบส่วนหัว แบรนด์ และลิงก์นำทาง พร้อมแสดงคำอธิบายตามหน้าปัจจุบัน
 export function SiteHeader() {
     const location = useLocation();
 
@@ -21,6 +22,7 @@ export function SiteHeader() {
                         </span>
                     </div>
                 </Link>
+                {/* # จุดเชื่อมจากทุกหน้า: แบรนด์ไปหน้าแรก และเมนูไปหน้าประวัติหรือรายการโปรด */}
                 <nav className="nav-actions" aria-label="Main navigation">
                     <Link
                         to="/history.html"
@@ -42,6 +44,7 @@ export function SiteHeader() {
     );
 }
 
+// # ปุ่มย้อนกลับ: ใช้ประวัติการนำทางภายในเว็บเมื่อมีที่มาในโดเมนเดียวกัน
 export function BackButton() {
     const navigate = useNavigate();
 
@@ -61,6 +64,7 @@ export function BackButton() {
     );
 }
 
+// # ท้ายหน้าแสดงชื่อร้านและแหล่งข้อมูลต้นไม้
 export function SiteFooter() {
     return (
         <footer className="footer">
@@ -70,6 +74,7 @@ export function SiteFooter() {
     );
 }
 
+// # รวมส่วนหัว เนื้อหาหน้า ท้ายหน้า และปุ่มย้อนกลับตามตัวเลือก
 export default function SiteLayout({ children, showBack = false }) {
     return (
         <>

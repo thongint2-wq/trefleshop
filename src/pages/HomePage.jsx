@@ -11,7 +11,9 @@ import {
     saveSearchState
 } from "../utils/plantUtils";
 
+// # จัดการหน้าแรก การค้นหา คำแนะนำ และสถานะการเลือกต้นไม้
 export default function HomePage() {
+    // # คืนค่าสถานะค้นหาจาก sessionStorage เพื่อรักษาผลลัพธ์เมื่อเปลี่ยนหน้า
     const savedState = readSearchState();
     const [query, setQuery] = useState(
         typeof savedState?.query === "string" ? savedState.query : ""
@@ -30,6 +32,7 @@ export default function HomePage() {
     const [recommendationsError, setRecommendationsError] = useState(false);
     const activeSearchId = useRef(0);
 
+    // # โหลดรายการแนะนำเมื่อเปิดหน้าแรก
     useEffect(() => {
         document.title = "Trefle Plant Shop";
         let active = true;
@@ -54,6 +57,7 @@ export default function HomePage() {
         };
     }, []);
 
+    // # ค้นหาต้นไม้ ตรวจสอบผลลัพธ์ เรียงชื่อ และบันทึกสถานะการค้นหา
     async function runSearch(event) {
         event.preventDefault();
         const searchId = ++activeSearchId.current;
@@ -100,6 +104,7 @@ export default function HomePage() {
         }
     }
 
+    // # ยกเลิกการค้นหาปัจจุบันและล้างคำค้น ผลลัพธ์ และข้อมูลที่บันทึกไว้
     function clearSearch() {
         activeSearchId.current += 1;
         setQuery("");
@@ -111,6 +116,7 @@ export default function HomePage() {
         clearSearchState();
     }
 
+    // # จดจำต้นไม้ที่เลือกเพื่อแสดงสถานะและคงข้อมูลค้นหาไว้
     function openDetails(plantSlug) {
         setSelectedSlug(plantSlug);
         const currentState = readSearchState();

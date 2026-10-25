@@ -2,6 +2,7 @@ import PlantCard from "./PlantCard";
 import { EmptyState, ErrorState, LoadingState } from "./Feedback";
 import ResultSection from "./ResultSection";
 
+// # แสดงต้นไม้แนะนำ พร้อมรองรับสถานะโหลด ข้อผิดพลาด และไม่มีผลลัพธ์
 export default function RecommendationsSection({
     plants,
     loading,

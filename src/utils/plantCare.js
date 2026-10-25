@@ -1,9 +1,11 @@
+// # ตรวจสอบว่าค่ามีข้อมูลที่นำไปแสดงผลได้
 function hasValue(value) {
     return value !== null &&
         value !== undefined &&
         (typeof value !== "string" || value.trim() !== "");
 }
 
+// # จัดรูปแบบค่าต่ำสุดและสูงสุดให้อ่านง่าย
 export function formatRange(minimum, maximum) {
     if (!hasValue(minimum) && !hasValue(maximum)) {
         return null;
@@ -16,6 +18,7 @@ export function formatRange(minimum, maximum) {
     return hasValue(minimum) ? `ตั้งแต่ ${minimum}` : `สูงสุด ${maximum}`;
 }
 
+// # แปลงช่วงอุณหภูมิทั้งองศาเซลเซียสและฟาเรนไฮต์
 function formatTemperatureRange(minimum, maximum) {
     const celsius = formatRange(minimum?.deg_c, maximum?.deg_c);
     const fahrenheit = formatRange(minimum?.deg_f, maximum?.deg_f);
@@ -27,6 +30,7 @@ function formatTemperatureRange(minimum, maximum) {
     return values.length ? values.join(" / ") : null;
 }
 
+// # แปลงหมายเลขหรือชื่อเดือนภาษาอังกฤษเป็นชื่อเดือนภาษาไทย
 function formatMonths(months) {
     if (!Array.isArray(months) || months.length === 0) {
         return null;
@@ -61,6 +65,7 @@ function formatMonths(months) {
     }).join(", ");
 }
 
+// # จัดข้อมูลดิบจาก Trefle เป็นหมวดการดูแล และตัดค่าที่ไม่มีข้อมูลออก
 export function getPlantCareSections(plant) {
     const growth = plant.main_species?.growth || plant.growth || {};
     return [
@@ -113,6 +118,7 @@ export function getPlantCareSections(plant) {
     })).filter(section => section.metrics.length > 0);
 }
 
+// # แปลคะแนนการดูแลเป็นสถานะและคำแนะนำตามประเภทปัจจัย
 export function getCareStatus(label, value) {
     const score = Number(value);
 
@@ -137,6 +143,7 @@ export function getCareStatus(label, value) {
     return { text: "ปานกลาง", tip: "ดูแลตามสภาพอากาศทั่วไป" };
 }
 
+// # เลือกไอคอนให้ตรงกับชนิดข้อมูลการดูแล
 export function getCareIcon(label) {
     if (label.includes("แสง")) return "☀️";
     if (label.includes("ความชื้นในดิน")) return "🪴";

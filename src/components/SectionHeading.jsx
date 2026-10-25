@@ -1,3 +1,4 @@
+// # หัวข้อประจำส่วน พร้อมป้ายกำกับและปุ่มหรือป้ายสถานะทางเลือก
 export default function SectionHeading({ eyebrow, title, action, badge }) {
     return (
         <div className="section-heading">

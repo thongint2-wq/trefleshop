@@ -1,3 +1,4 @@
+// # เรียงชื่อต้นไม้ตามตัวอักษรด้วยอัลกอริทึม Insertion Sort
 export function insertionSort(plants) {
     const sortedPlants = [...plants];
 
@@ -19,9 +20,11 @@ export function insertionSort(plants) {
     return sortedPlants;
 }
 
+// # ชื่อคีย์ที่ใช้เก็บสถานะค้นหาและประวัติใน sessionStorage
 export const SEARCH_STATE_KEY = "treflePlantSearchState";
 export const VIEW_HISTORY_KEY = "treflePlantViewHistory";
 
+// # อ่านสถานะการค้นหาที่บันทึกไว้
 export function readSearchState() {
     try {
         return JSON.parse(sessionStorage.getItem(SEARCH_STATE_KEY) || "null");
@@ -31,6 +34,7 @@ export function readSearchState() {
     }
 }
 
+// # บันทึกสถานะการค้นหา
 export function saveSearchState(state) {
     try {
         sessionStorage.setItem(SEARCH_STATE_KEY, JSON.stringify(state));
@@ -39,6 +43,7 @@ export function saveSearchState(state) {
     }
 }
 
+// # ลบสถานะการค้นหาที่บันทึกไว้
 export function clearSearchState() {
     try {
         sessionStorage.removeItem(SEARCH_STATE_KEY);
@@ -47,6 +52,7 @@ export function clearSearchState() {
     }
 }
 
+// # อ่านและตรวจสอบรูปแบบรายการประวัติการดู
 export function readViewHistory() {
     try {
         const entries = JSON.parse(sessionStorage.getItem(VIEW_HISTORY_KEY) || "[]");
@@ -59,6 +65,7 @@ export function readViewHistory() {
     }
 }
 
+// # บันทึกต้นไม้ที่เปิดดูพร้อมข้อมูลพื้นฐานและเวลาที่เข้าชม
 export function recordPlantView(plant) {
     if (!plant || typeof plant.slug !== "string") {
         throw new TypeError("A plant with a slug is required for view history.");
@@ -80,6 +87,7 @@ export function recordPlantView(plant) {
     }
 }
 
+// # ลบประวัติการดูทั้งหมดออกจาก sessionStorage
 export function clearViewHistory() {
     try {
         sessionStorage.removeItem(VIEW_HISTORY_KEY);

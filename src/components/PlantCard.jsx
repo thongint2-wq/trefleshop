@@ -2,12 +2,15 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { addFavorite, checkFavorite, removeFavorite } from "../services/plantApi";
 
+// # การ์ดแสดงข้อมูลต้นไม้ พร้อมลิงก์รายละเอียดและปุ่มจัดการรายการโปรด
 export default function PlantCard({ plant, selected = false, onRemove, onOpenDetails }) {
+    // # เก็บสถานะรายการโปรด การบันทึก รูปภาพ และข้อผิดพลาดของแต่ละการ์ด
     const [favorite, setFavorite] = useState(onRemove ? true : null);
     const [saving, setSaving] = useState(false);
     const [imageFailed, setImageFailed] = useState(false);
     const [favoriteError, setFavoriteError] = useState("");
 
+    // # โหลดสถานะรายการโปรดเมื่อการ์ดแสดงผล ยกเว้นกรณีอยู่ในหน้ารายการโปรด
     useEffect(() => {
         if (onRemove) {
             setFavorite(true);
@@ -30,6 +33,7 @@ export default function PlantCard({ plant, selected = false, onRemove, onOpenDet
         };
     }, [plant.slug, Boolean(onRemove)]);
 
+    // # เพิ่มหรือเอาต้นไม้ออกจากรายการโปรด แล้วอัปเดตสถานะบนการ์ด
     async function toggleFavorite() {
         if ((!onRemove && favorite === null) || favoriteError) return;
 
@@ -51,6 +55,7 @@ export default function PlantCard({ plant, selected = false, onRemove, onOpenDet
         }
     }
 
+    // # เนื้อหาการ์ดประกอบด้วยรูป ชื่อ ปุ่มเปิดรายละเอียด และปุ่มรายการโปรด
     return (
         <article className={`plant-card${selected ? " is-selected" : ""}`} data-plant-slug={plant.slug || ""}>
             {selected && <span className="selected-plant-marker">Currently viewing</span>}
@@ -65,6 +70,7 @@ export default function PlantCard({ plant, selected = false, onRemove, onOpenDet
             <h3>{plant.common_name || "Unknown plant"}</h3>
             <p className="scientific-name">{plant.scientific_name || "Scientific name unavailable"}</p>
             <div className="card-buttons">
+                {/* # จุดเชื่อมจากหน้าแรกหรือรายการโปรดไปยังหน้ารายละเอียดต้นไม้ */}
                 <Link
                     className="secondary-button"
                     to={`/plantDetail.html?slug=${encodeURIComponent(plant.slug)}`}

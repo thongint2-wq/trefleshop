@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { addFavorite, checkFavorite, removeFavorite } from "../services/plantApi";
 import PlantCare from "./PlantCare";
 
+// # แสดงข้อมูลต้นไม้ รายการโปรด และรายละเอียดวิธีดูแล
 export default function PlantDetail({ plant }) {
+    // # สถานะรายการโปรดของต้นไม้ รวมถึงสถานะกำลังบันทึกและข้อผิดพลาด
     const [favorite, setFavorite] = useState(null);
     const [saving, setSaving] = useState(false);
     const [favoriteError, setFavoriteError] = useState(false);
 
+    // # ตรวจสอบสถานะรายการโปรดเมื่อเปลี่ยนต้นไม้ที่กำลังแสดง
     useEffect(() => {
         let active = true;
         checkFavorite(plant.slug)
@@ -23,6 +26,7 @@ export default function PlantDetail({ plant }) {
         };
     }, [plant.slug]);
 
+    // # สลับสถานะรายการโปรดและจัดการผลลัพธ์จาก API
     async function toggleFavorite() {
         setSaving(true);
         try {
@@ -43,6 +47,7 @@ export default function PlantDetail({ plant }) {
 
     return (
         <>
+            {/* # ภาพ ชื่อสามัญ ชื่อวิทยาศาสตร์ และปุ่มรายการโปรด */}
             {plant.image_url && (
                 <img className="detail-image" src={plant.image_url} alt={plant.common_name || plant.scientific_name} />
             )}
@@ -66,6 +71,7 @@ export default function PlantDetail({ plant }) {
                         Unable to check favorite status. Please refresh and try again.
                     </p>
             )}
+            {/* # แสดงข้อมูลการดูแลที่แปลงจากข้อมูลรายละเอียดของต้นไม้ */}
             <PlantCare plant={plant} />
         </>
     );

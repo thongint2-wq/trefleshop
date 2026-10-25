@@ -1,5 +1,6 @@
 import { getCareIcon, getCareStatus, getPlantCareSections } from "../utils/plantCare";
 
+// # แสดงค่าการดูแลแบบคะแนนพร้อมสถานะ ไอคอนระดับ และคำแนะนำ
 function CareMetric({ metric }) {
     if (metric.score !== null && metric.score !== undefined) {
         const score = Math.min(10, Math.max(0, Number(metric.score)));
@@ -47,6 +48,8 @@ function CareMetric({ metric }) {
     );
 }
 
+// # แสดงค่าการดูแลแบบข้อความ เช่น ช่วงอุณหภูมิหรือเดือนที่เหมาะสม
+// # เลือกสีและไอคอนของหมวดตามชื่อหัวข้อ
 function CareSection({ section }) {
     let themeClass = "";
     let icon = "🌿";
@@ -77,6 +80,7 @@ function CareSection({ section }) {
     );
 }
 
+// # สร้างส่วนข้อมูลการดูแลทั้งหมดจากข้อมูลต้นไม้
 export default function PlantCare({ plant }) {
     const sections = getPlantCareSections(plant);
 

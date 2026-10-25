@@ -1,3 +1,4 @@
+// # แสดงสถานะระหว่างรอข้อมูล พร้อมหัวข้อและข้อความเสริมที่เลือกได้
 export function LoadingState({ title = "Loading...", message }) {
     return (
         <div className="loading-state">
@@ -8,6 +9,7 @@ export function LoadingState({ title = "Loading...", message }) {
     );
 }
 
+// # แสดงข้อความแจ้งข้อผิดพลาดให้ผู้ใช้รับรู้
 export function ErrorState({ title = "Something went wrong", message = "Please try again." }) {
     return (
         <div className="error-state" role="alert">
@@ -18,6 +20,7 @@ export function ErrorState({ title = "Something went wrong", message = "Please t
     );
 }
 
+// # แสดงข้อความเมื่อยังไม่มีข้อมูล พร้อมพื้นที่ใส่ปุ่มหรือลิงก์เพิ่มเติม
 export function EmptyState({ title, message, children }) {
     return (
         <div className="empty-state">

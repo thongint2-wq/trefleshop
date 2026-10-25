@@ -2,6 +2,7 @@ import PlantCard from "./PlantCard";
 import { EmptyState, ErrorState, LoadingState } from "./Feedback";
 import ResultSection from "./ResultSection";
 
+// # เลือกเนื้อหาที่จะแสดงตามสถานะค้นหา: กำลังโหลด ผิดพลาด ว่าง หรือพบผลลัพธ์
 function SearchResults({
     plants,
     loading,
@@ -38,6 +39,7 @@ function SearchResults({
     ));
 }
 
+// # จัดวางหัวข้อผลค้นหาและรายการต้นไม้ที่ SearchResults เลือกมา
 export default function PlantSearchSection({
     plants,
     loading,

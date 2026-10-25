@@ -6,13 +6,16 @@ import PlantHistoryCard from "../components/PlantHistoryCard";
 import ResultSection from "../components/ResultSection";
 import { clearViewHistory, readViewHistory } from "../utils/plantUtils";
 
+// # แสดงประวัติต้นไม้ที่เปิดล่าสุด และให้ผู้ใช้ล้างประวัติได้
 export default function HistoryPage() {
     const [plants, setPlants] = useState(() => readViewHistory().reverse());
 
+    // # กำหนดชื่อแท็บและนำประวัติที่บันทึกไว้มาจัดลำดับล่าสุดก่อน
     useEffect(() => {
         document.title = "Viewing History | Trefle Plant Shop";
     }, []);
 
+    // # ล้างประวัติใน sessionStorage และอัปเดตหน้าจอ
     function clearHistory() {
         clearViewHistory();
         setPlants([]);
