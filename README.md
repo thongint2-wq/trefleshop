@@ -74,40 +74,50 @@
 ## 5. โครงสร้างไฟล์สำคัญ
 
 ```text
-src/
-  components/       ส่วนประกอบ UI ที่ใช้ร่วมกัน เช่น PlantCard, PlantCare, Feedback
-  pages/            HomePage, FavoritesPage, HistoryPage, PlantDetailPage
+frontend/
+  index.html
+  public/            ไฟล์ static ที่ Vite ให้บริการ เช่นวิดีโอหน้าแรก
+  vite.config.js
+  src/
+    components/      ส่วนประกอบ UI ที่ใช้ร่วมกัน เช่น PlantCard, PlantCare, Feedback
+    pages/           HomePage, FavoritesPage, HistoryPage, PlantDetailPage
+    services/        API client สำหรับเรียก Express
+    utils/           Insertion Sort และฟังก์ชันจัดการ sessionStorage
+    Graph.js         adjacency list ของการเชื่อมโยงหน้าต่าง ๆ และ BFS
+    main.jsx         จุดเริ่มต้น React และ React Router
+    styles.css       CSS ของเว็บไซต์
+backend/
   routes/            เส้นทาง API ของ Express
-  services/          การเรียก Trefle API, API client และ favorite service
-  utils/             Insertion Sort และฟังก์ชันจัดการ sessionStorage
-  graph.js           adjacency list ของการเชื่อมโยงหน้าต่าง ๆ และ BFS
+  services/          Trefle API และ favorite service
   index.js           จุดเริ่มต้น Express
-  main.jsx           จุดเริ่มต้น React และ React Router
-  styles.css         CSS ของเว็บไซต์
+  server.js          entry point สำรองที่ส่งออกแอปหลัก
+api/
+  index.js           adapter สำหรับ deploy Express API บน Vercel
+package.json         scripts และ dependencies ที่ใช้ร่วมกัน
 ```
 
 ## 6. Graph.js: การเชื่อมโยงหน้าเว็บ
 
-ไฟล์ `src/graph.js` เก็บกราฟแบบ **adjacency list** โดย node คือหน้าเว็บ และ edge คือการเชื่อมไปยังหน้าอื่น
+ไฟล์ `frontend/src/Graph.js` เก็บกราฟแบบ **adjacency list** โดย node คือหน้าเว็บ และ edge คือการเชื่อมไปยังหน้าอื่น
 
 | Node | URL | หน้าที่เชื่อมไปได้ตาม `pageGraph` |
 |---|---|---|
 | `home` | `/` | home, history, favorites, detail |
 | `favorites` | `/favorites.html` | home, history, favorites, detail |
 | `history` | `/history.html` | home, favorites, history, detail |
-| `detail` | `/plantDetail.html` | home, history, favorites |
+| `detail` | `/plantDetail.html` | home, history, favorites, detail |
 
 นอกจากนี้ `canReach(start, end)` ใช้ **Breadth-First Search (BFS)** ตรวจว่ามีเส้นทางจากหน้าเริ่มต้นไปหน้าปลายทางหรือไม่ และ `checkGraph()` ใช้ตรวจหน้าที่ไปไม่ถึงหรือไม่มีเส้นทางกลับหน้าแรก
 
-เมนูส่วนหัวสร้างจาก Graph โดย `SiteHeader` อ่าน node ปัจจุบันจาก URL แล้ววน edge ที่ออกจาก node นั้นใน `pageGraph` จากนั้นเลือกเฉพาะปลายทางที่มี `menuLabel` ใน `pageLabels` และใช้ `pagePaths` กำหนด URL ของ `<Link>` ดังนั้นการเพิ่ม/ถอด edge หรือกำหนด node ให้เป็นเมนูทำที่ข้อมูล Graph ได้ โดยไม่ต้องเขียน `<Link>` แยกรายการใน JSX ทั้งนี้ `pageGraph` เก็บลำดับการแสดงเมนูตามลำดับ edge ของแต่ละ node
+เมนูส่วนหัวสร้างจาก Graph: `SiteHeader` ระบุ node ปัจจุบันจาก URL แล้วเลือก edge ปลายทางที่มี `menuLabel` ใน `pageLabels` และใช้ `pagePaths` กำหนด URL ของ `<Link>` จึงกำหนดเมนูได้จากข้อมูล Graph โดยไม่ต้องเขียน `<Link>` แยกรายการใน JSX ทั้งนี้ `pageGraph` กำหนดลำดับแสดงเมนูตามลำดับ edge ของแต่ละ node
 
 ## 7. DSA ที่ใช้กับข้อมูลจริง
 
 | DSA | ไฟล์/จุดที่ใช้ | เหตุผลที่เลือก | Complexity |
 |---|---|---|---|
-| Insertion Sort | `src/utils/plantUtils.js`, เรียกใช้ใน `src/pages/HomePage.jsx` | เรียงผลการค้นหาตาม `common_name` ก่อนแสดงผล เพื่อให้ผู้ใช้ไล่ดูชื่อ A–Z ได้ง่าย | Best case: O(n); Average/Worst case: O(n²); ใช้พื้นที่เพิ่ม O(n) เพราะคัดลอก array ก่อนเรียง |
-| Hash Table ผ่าน `Map` | `src/services/favoriteService.js` | ใช้ `slug` เป็น key เพื่อเพิ่ม ตรวจสอบ และลบรายการโปรดได้ตรงรายการ และไม่สร้าง key ซ้ำเมื่อบันทึก slug เดิม | `set/has/delete` เฉลี่ย O(1); พื้นที่ O(n) ตามจำนวนรายการโปรด |
-| Graph + BFS | `src/graph.js` | ใช้แทนความสัมพันธ์ของหน้า และตรวจสอบการเข้าถึงหน้าด้วย BFS | BFS โดยทั่วไป O(V + E) โดย V คือจำนวนหน้าและ E คือจำนวนเส้นเชื่อม |
+| Insertion Sort | `frontend/src/utils/plantUtils.js`, เรียกใช้ใน `frontend/src/pages/HomePage.jsx` | เรียงผลการค้นหาตาม `common_name` ก่อนแสดงผล เพื่อให้ผู้ใช้ไล่ดูชื่อ A–Z ได้ง่าย | Best case: O(n); Average/Worst case: O(n²); ใช้พื้นที่เพิ่ม O(n) เพราะคัดลอก array ก่อนเรียง |
+| Hash Table ผ่าน `Map` | `backend/services/favoriteService.js` | ใช้ `slug` เป็น key เพื่อเพิ่ม ตรวจสอบ และลบรายการโปรดได้ตรงรายการ และไม่สร้าง key ซ้ำเมื่อบันทึก slug เดิม | `set/has/delete` เฉลี่ย O(1); พื้นที่ O(n) ตามจำนวนรายการโปรด |
+| Graph + BFS | `frontend/src/Graph.js` | ใช้แทนความสัมพันธ์ของหน้า และตรวจสอบการเข้าถึงหน้าด้วย BFS | BFS โดยทั่วไป O(V + E) โดย V คือจำนวนหน้าและ E คือจำนวนเส้นเชื่อม |
 
 ## 8. ตารางส่วนร่วมของสมาชิก
 

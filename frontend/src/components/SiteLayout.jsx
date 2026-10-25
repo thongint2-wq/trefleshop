@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { pageGraph, pageLabels, pagePaths } from "../graph";
+import { pageGraph, pageLabels, pagePaths } from "../Graph";
 
 // # แถบส่วนหัว แบรนด์ และลิงก์นำทาง พร้อมแสดงคำอธิบายตามหน้าปัจจุบัน
 export function SiteHeader() {
@@ -27,7 +27,7 @@ export function SiteHeader() {
                         </span>
                     </div>
                 </Link>
-                {/* # สร้างเมนูจาก node/edge ใน graph.js โดยใช้ path และ label ของ node */}
+                {/* # สร้างเมนูจาก node/edge ใน Graph.js โดยใช้ path และ label ของ node */}
                 <nav className="nav-actions" aria-label="Main navigation">
                     {menuPages.map(page => (
                         <Link

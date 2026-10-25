@@ -1223,7 +1223,7 @@ body {
         flex: 1;
         padding: 9px 8px;
         text-align: center;
-        white-space: nowrap;
+        white-space: normal;
     }
 
     .hero {

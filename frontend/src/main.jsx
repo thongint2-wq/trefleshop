@@ -13,7 +13,7 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* # จุดเชื่อมจากหน้าแรกไปหน้ารายการโปรด ประวัติ และรายละเอียดผ่านเมนูหรือการ์ดต้นไม้ */}
+                {/* # จุดเชื่อมหน้าแรกไปยังหน้าอื่นผ่านเมนูและการ์ดต้นไม้ */}
                 <Route path="/" element={<SiteLayout><HomePage /></SiteLayout>} />
                 {/* # หน้ารายการโปรด เชื่อมกลับหน้าแรก/ประวัติจากเมนู และไปหน้ารายละเอียดจากการ์ด */}
                 <Route
@@ -25,7 +25,7 @@ function App() {
                     path="/history.html"
                     element={<SiteLayout showBack><HistoryPage /></SiteLayout>}
                 />
-                {/* # หน้ารายละเอียดต้นไม้ เมนูส่วนหัวเชื่อมไปหน้าแรก ประวัติ และรายการโปรด */}
+                {/* # หน้ารายละเอียดต้นไม้เชื่อมกับหน้าอื่นผ่านเมนูส่วนหัว */}
                 <Route
                     path="/plantDetail.html"
                     element={<SiteLayout showBack><PlantDetailPage /></SiteLayout>}
