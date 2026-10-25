@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "concurrently -k \"npm:dev:server\" \"vite --host 0.0.0.0\"",
+    "dev:server": "node --watch src/index.js",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +16,14 @@
   "type": "commonjs",
   "dependencies": {
     "dotenv": "^18.0.4",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "vite": "^8.3.5"
   }
 }

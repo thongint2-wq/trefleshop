@@ -1,22 +1,22 @@
-// # จัดเก็บและจัดการข้อมูล Favorite ในหน่วยความจำของเซิร์ฟเวอร์
+// # จัดเก็บและจัดการรายการโปรดในหน่วยความจำของเซิร์ฟเวอร์
 const favorites = new Map();
 
-// # เพิ่มหรือแทนที่รายการด้วย slug เพื่อไม่ให้มีคีย์ซ้ำ
+// # เพิ่มหรือแทนที่รายการด้วย slug เพื่อป้องกันคีย์ซ้ำ
 function addFavorite(plant) {
     favorites.set(plant.slug, plant);
 }
 
-// # ลบรายการ Favorite ตาม slug
+// # ลบรายการโปรดด้วย slug
 function removeFavorite(slug) {
     favorites.delete(slug);
 }
 
-// # คืนรายการทั้งหมดเป็น Array สำหรับส่งให้ API
+// # ส่งรายการทั้งหมดกลับเป็น Array สำหรับ API
 function getFavorites() {
     return Array.from(favorites.values());
 }
 
-// # ตรวจสอบว่ามี slug นี้อยู่ในรายการ Favorite หรือไม่
+// # ตรวจสอบว่ามีต้นไม้ slug นี้อยู่ในรายการโปรดหรือไม่
 function isFavorite(slug) {
     return favorites.has(slug);
 }

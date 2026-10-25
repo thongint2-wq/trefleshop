@@ -1,32 +1,52 @@
 # Trefle Plant Shop
 
-โปรเจกต์ร้านขายต้นไม้โดยใช้ Trefle API
+A plant shop project powered by the Trefle API.
 
 ## Features
 
-- ค้นหาชื่อต้นไม้
-- แสดงดอกไม้แนะนำและข้อมูลการดูแล
-- ดูรายละเอียดต้นไม้
-- เรียงชื่อต้นไม้ A-Z
-- เพิ่มต้นไม้ในรายการโปรด
-- ลบต้นไม้ออกจากรายการโปรด
+- Search for plants by name
+- Browse recommended flowers and care information
+- View plant details
+- Sort plant names from A to Z
+- Add plants to favorites
+- Remove plants from favorites
 
 ## Plant API
 
-- `GET /api/plants/search?q=rose` ค้นหาต้นไม้จาก Trefle
-- `GET /api/plants/recommendations` แสดงดอกไม้แนะนำ เรียงตามความครบถ้วนของข้อมูลดูแล
-- `GET /api/plants/:id` ดูรายละเอียดพืชด้วย ID หรือ slug
-- `GET /api/favorites` ดูรายการโปรด
-- `POST /api/favorites` เพิ่มรายการโปรด โดยส่งข้อมูลต้นไม้เป็น JSON
-- `GET /api/favorites/:slug` ตรวจสอบว่าต้นไม้อยู่ในรายการโปรดหรือไม่
-- `DELETE /api/favorites/:slug` ลบต้นไม้ออกจากรายการโปรด
-- ผลดอกไม้แนะนำถูกเก็บชั่วคราว 30 นาที ส่วนรายการโปรดเก็บในหน่วยความจำและจะถูกล้างเมื่อเซิร์ฟเวอร์เริ่มใหม่
+- `GET /api/plants/search?q=rose` searches Trefle for plants.
+- `GET /api/plants/recommendations` returns recommended flowers, ranked by the completeness of their care information.
+- `GET /api/plants/:id` retrieves plant details by ID or slug.
+- `GET /api/favorites` returns the favorites list.
+- `POST /api/favorites` adds a plant to favorites using a JSON request body.
+- `GET /api/favorites/:slug` checks whether a plant is in favorites.
+- `DELETE /api/favorites/:slug` removes a plant from favorites.
+- Recommended flowers are cached for 30 minutes. Favorites are stored in memory and cleared when the server restarts.
 
-## การตั้งค่า API
+## API Configuration
 
-- กำหนด `TREFLE_TOKEN` ในไฟล์ `.env` ก่อนเริ่มเซิร์ฟเวอร์ในเครื่อง
-- เมื่อนำขึ้น Vercel ให้เพิ่ม `TREFLE_TOKEN` ใน Project Settings > Environment Variables แล้ว deploy ใหม่
-- หาก API ค้นหาไม่ได้ หน้าเว็บจะแสดงข้อความจากเซิร์ฟเวอร์เพื่อช่วยตรวจสอบสาเหตุ
+- Set `TREFLE_TOKEN` in a `.env` file before starting the server locally.
+- When deploying to Vercel, add `TREFLE_TOKEN` under Project Settings > Environment Variables, then redeploy.
+- If a plant search fails, the website displays the server message to help diagnose the issue.
+
+## Development
+
+- Run `npm run dev` to start the Vite frontend and Express API server.
+- Run `npm run build` to create the production frontend in `dist`.
+- Run `npm start` to serve the production build and API from Express.
+
+## Frontend Structure
+
+```text
+src/
+  components/   Shared React UI components
+  pages/        Route-level React pages
+  services/     React API client and Express services
+  utils/        Plant sorting, browser storage, and care-data helpers
+  main.jsx      React application entry point
+  styles.css    Shared application styles
+  routes/       Express API routes
+  services/     Express API services
+```
 
 ## DSA
 
@@ -38,6 +58,8 @@
 - Node.js
 - Express
 - Trefle API
+- React
+- Vite
 - HTML
 - CSS
 - JavaScript

@@ -1,4 +1,4 @@
-// # กำหนด API endpoints สำหรับค้นหา ดูคำแนะนำ และดูรายละเอียดต้นไม้
+// # กำหนด API endpoints สำหรับค้นหาต้นไม้ ดูคำแนะนำ และดูรายละเอียด
 const express = require("express");
 const router = express.Router();
 
@@ -8,23 +8,23 @@ const {
     getFlowerRecommendations
 } = require("../services/trefleService");
 
-// # รับคำค้นจาก query string แล้วส่งผลการค้นหาจากบริการ Trefle
+// # อ่านคำค้นจาก query string แล้วส่งผลการค้นหาจาก Trefle
 router.get("/search", async (req, res) => {
     const query = typeof req.query.q === "string" ? req.query.q.trim() : "";
 
     if (!query) {
-        return res.status(400).json({ error: "กรุณาระบุชื่อต้นไม้" });
+        return res.status(400).json({ error: "Please provide a plant name" });
     }
 
     res.json(await searchPlants(query));
 });
 
-// # ส่งชุดดอกไม้แนะนำที่บริการรวบรวมและจัดอันดับแล้ว
+// # ส่งรายการดอกไม้แนะนำที่บริการรวบรวมและจัดอันดับไว้
 router.get("/recommendations", async (req, res) => {
     res.json({ data: await getFlowerRecommendations() });
 });
 
-// # ค้นหารายละเอียดต้นไม้จาก slug ที่ระบุใน URL
+// # ค้นหารายละเอียดต้นไม้ด้วย slug ใน URL
 router.get("/:slug", async (req, res) => {
     res.json(await getPlantDetail(req.params.slug));
 });
