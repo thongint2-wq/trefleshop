@@ -2,16 +2,16 @@ const crypto = require("crypto");
 
 const SESSION_COOKIE = "trefle_favorites_session";
 
-// # เก็บรายการโปรดแยกตาม session ในหน่วยความจำของ Node.js
+// # เก็บรายการโปรดใน Array ของหน่วยความจำของ Node.js
 // ข้อมูลจะหายเมื่อเซิร์ฟเวอร์ restart หรือ serverless instance ถูกสร้างใหม่
-const favoritesByOwner = new Map();
+const favorites = [];
 
 function readFavorites(ownerId) {
-    return favoritesByOwner.get(ownerId) || [];
+    return favorites;
 }
 
 function writeFavorites(ownerId, plants) {
-    favoritesByOwner.set(ownerId, plants);
+    favorites.splice(0, favorites.length, ...plants);
 }
 
 function getOwnerId(req, res) {
