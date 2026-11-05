@@ -20,18 +20,6 @@
 | Client storage | `sessionStorage` สำหรับสถานะการค้นหาและประวัติการดู |
 | DSA | Insertion Sort, key-based session storage และ Graph แบบ adjacency list |
 
-### ภาพรวมการทำงาน
-
-```mermaid
-flowchart LR
-    U[ผู้ใช้] --> F[React + Vite]
-    F -->|HTTP /api/...| E[Express Backend]
-    E -->|ส่ง token จาก Environment Variable| T[Trefle API]
-    T --> E
-    E -->|JSON response| F
-    F --> U
-```
-
 React ติดต่อ Express ผ่าน endpoint `/api/...` ส่วน Express เป็นตัวกลางติดต่อ Trefle API และอ่าน `TREFLE_TOKEN` จาก Environment Variable เพื่อไม่ให้ต้องใส่ token ไว้ในโค้ด Frontend
 
 ### การจัดเก็บข้อมูล
@@ -116,18 +104,6 @@ Express มี endpoint ดังนี้
 | `GET` | `/api/favorites/:slug` | ตรวจสอบว่าต้นไม้เป็น Favorite ของ browser session |
 | `DELETE` | `/api/favorites/:slug` | ลบต้นไม้จาก Favorites ของ browser session |
 | `GET` | `/api/test` | ตรวจสอบว่า Express API ทำงานอยู่ |
-
-ตัวอย่างการเพิ่มรายการโปรดด้วย JSON:
-
-```http
-POST /api/favorites
-Content-Type: application/json
-
-{
-  "slug": "ตัวอย่าง-slug",
-  "common_name": "ตัวอย่างต้นไม้"
-}
-```
 
 ### การทำงานของ Backend
 
@@ -218,36 +194,6 @@ flowchart TD
 4. **เก็บต้นไม้ที่สนใจ:** ผู้ใช้กด Save/Remove จากการ์ดหรือหน้ารายละเอียดได้
 5. **ย้อนดูข้อมูลเดิม:** มีหน้า Favorites และ Viewing History ช่วยให้ผู้ใช้กลับไปยังต้นไม้ที่สนใจโดยไม่ต้องเริ่มค้นหาใหม่
 6. **คงผลค้นหาใน session:** คำค้นและผลการค้นหาถูกเก็บใน `sessionStorage` เพื่อช่วยรักษาสถานะระหว่างการเปลี่ยนหน้า
-
-### เปรียบเทียบ Before → After
-
-> ตาราง Before/After สรุปพฤติกรรมที่ตรวจสอบได้จากโค้ดและเอกสารเวอร์ชันก่อนหน้า ส่วนภาพหลักฐานควรใช้ screenshot จากงานที่ส่งจริงจึงจำกัดอาร์กิวเมนต์ในคลิปที่ไฟล์ภาพยืนยันได้
-
-| ประเด็น | Before: งาน API ครั้งแรก | After: เวอร์ชันปัจจุบัน |
-|---|---|---|
-| การเริ่มค้นหา/เลือกต้นไม้ | ระบบก่อนปรับใช้หน้าค้นหาและการ์ดต้นไม้เพื่อเลือกดูผลลัพธ์ | มีรายการแนะนำบน Home และช่องค้นหาในหน้าเดียว |
-| การดูรายละเอียด | ระบบก่อนปรับเปิดข้อมูลรายละเอียดจากรายการต้นไม้ | เปิดหน้า Plant Detail จากปุ่ม `View details` บนการ์ด |
-| ข้อมูลการดูแล | ระบบก่อนปรับแสดงข้อมูลต้นไม้และข้อมูลดูแลที่ได้จาก API | แสดงข้อมูลดูแลที่แปลงตามชนิดข้อมูลและแยกเป็นหมวดชัดเจน |
-| การกลับมาดูต้นไม้ที่สนใจ | ระบบก่อนปรับใช้ฟังก์ชัน Favorites และประวัติในระดับหน้าต่างๆ | มี Favorites และ Viewing History พร้อมล้างประวัติและไม่เก็บซ้ำ slug เดิม |
-| การรักษาผลค้นหา | ระบบก่อนปรับเก็บสถานะค้นหาใน client storage | เก็บคำค้นและผลการค้นหาใน `sessionStorage` |
-
-### ภาพหลักฐาน Before / After ที่ต้องเพิ่ม
-
-สร้างโฟลเดอร์ `docs/images/` ใน repository แล้วเพิ่มภาพจริงตามรายการนี้ จากนั้นจึงแทรก Markdown image link ในตารางหรือใต้หัวข้อนี้
-
-| ภาพที่ต้องใช้ | ชื่อไฟล์ที่แนะนำ |
-|---|---|
-| หน้า Home ก่อนปรับปรุง | `docs/images/before-home.png` |
-| หน้า Home หลังปรับปรุง | `docs/images/after-home.png` |
-| หน้ารายละเอียดก่อนปรับปรุง | `docs/images/before-detail.png` |
-| หน้ารายละเอียดหลังปรับปรุง | `docs/images/after-detail.png` |
-| หน้า Favorites หรือ Viewing History | `docs/images/after-favorites-history.png` |
-
-ตัวอย่าง Markdown สำหรับแทรกภาพหลังเพิ่มไฟล์แล้ว:
-
-```md
-![หน้า Home หลังปรับปรุง](docs/images/after-home.png)
-```
 
 ## 7. Graph.js และการนำทางระหว่างหน้า
 
@@ -384,64 +330,7 @@ flowchart TD
 
 การกำหนด dependency ให้สอดคล้องกับค่าที่ effect ใช้ ช่วยให้โหลดข้อมูลเมื่อจำเป็น ส่วน cleanup flag ใน effect ที่เรียก API ช่วยป้องกันการอัปเดต state หลัง component ถูกถอดออกจากหน้า หรือเมื่อผลลัพธ์จากคำขอเก่ากลับมาทีหลัง
 
-## 13. Component Tree และ Props
-
-### Component Tree ภาพรวม
-
-```text
-App (main.jsx)
-└── BrowserRouter
-    └── Routes
-        ├── /  → SiteLayout
-        │        ├── SiteHeader
-        │        ├── HomePage
-        │        │   ├── HomeHero
-        │        │   ├── RecommendationsSection
-        │        │   │   └── PlantCard
-        │        │   └── PlantSearchSection
-        │        │       └── SearchResults
-        │        │           └── PlantCard
-        │        └── SiteFooter
-        ├── /favorites.html → SiteLayout → FavoritesPage → PlantCard
-        ├── /history.html   → SiteLayout → HistoryPage → PlantHistoryCard
-        └── /plantDetail.html → SiteLayout → PlantDetailPage → PlantDetail → PlantCare
-```
-
-### ตัวอย่างทิศทาง Props และ Callback ในหน้า Home
-
-```text
-HomePage (ถือ state และจัดการการค้นหา)
-  │
-  ├── ส่ง query, searchViewActive ───────────────→ HomeHero
-  │                                                   │
-  │                                                   └── onQueryChange(value)
-  │                                                           │
-  │  setQuery(value)  ←────────────────────────────────────────┘
-  │
-  ├── ส่ง onSearch={runSearch} ─────────────────→ HomeHero
-  │  (HomeHero เรียกเมื่อ submit form)
-  │
-  ├── ส่ง onClearSearch={clearSearch} ──────────→ HomeHero
-  │  (HomeHero เรียกเมื่อกด Clear search)
-  │
-  └── ส่ง plants, loading, error, selectedSlug ─→ PlantSearchSection
-                                                      │
-                                                      └── PlantCard
-                                                           │
-                                                           └── onOpenDetails(slug)
-                                                                  │
-                                   openDetails(slug)  ←───────────┘
-```
-
-### เหตุผลที่วาง State
-
-- `HomePage` ถือ state การค้นหา เพราะต้องควบคุมทั้งช่องค้นหา ส่วนแนะนำ และผลการค้นหา
-- `HomeHero` เป็น component สำหรับรับค่าและแจ้งเหตุการณ์ผ่าน callback ไม่ควรเป็นเจ้าของ state ผลการค้นหาหลัก
-- `PlantSearchSection` รับข้อมูลและสถานะจาก `HomePage` แล้วเลือกแสดง Loading, Error, Empty หรือรายการการ์ด
-- `PlantCard` รับ `plant`, `selected`, `onOpenDetails` และ `onRemove` ผ่าน props เพื่อแสดงข้อมูลและแจ้งเหตุการณ์กลับไปยัง component แม่
-- `PlantDetailPage` ถือ state รายละเอียดต้นไม้ เพราะต้องโหลดข้อมูลตาม slug ใน URL
-
-## 14. สถานะ UX และการจัดการข้อผิดพลาด
+## 13. สถานะ UX และการจัดการข้อผิดพลาด
 
 | สถานะ | ตัวอย่างในโปรเจกต์ | การตอบสนองต่อผู้ใช้ |
 |---|---|---|
