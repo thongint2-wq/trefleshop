@@ -7,7 +7,6 @@ const fs = require("fs");
 dotenv.config();
 
 const plantRoutes = require("./routes/plantRoutes");
-const favoriteRoutes = require("./routes/favoriteRoutes");
 
 // # สร้างแอป แปลงข้อมูล JSON และให้บริการไฟล์หน้าเว็บ
 const app = express();
@@ -15,8 +14,6 @@ const app = express();
 app.use(express.json());
 
 app.use("/api/plants", plantRoutes);
-
-app.use("/api/favorites", favoriteRoutes);
 
 // # Endpoint สำหรับตรวจสอบว่าเซิร์ฟเวอร์พร้อมทำงานหรือไม่
 app.get("/api/test", (req, res) => {

@@ -26,13 +26,12 @@ React ติดต่อ Express ผ่าน endpoint `/api/...` ส่วน E
 
 | ข้อมูล | ที่จัดเก็บตามโค้ดปัจจุบัน | หมายเหตุ |
 |---|---|---|
-| รายการโปรดใน Frontend | Express API | Frontend เรียก API เพื่ออ่าน ตรวจสอบ เพิ่ม และลบรายการโปรด ไม่เก็บ favorites ใน `localStorage` |
-| รายการโปรดฝั่ง Express | Vercel KV/Redis บน production; JSON file บน local development | ข้อมูลแบบ persistent และแยกตาม browser session ผ่าน HttpOnly cookie |
+| รายการโปรด | `localStorage` | เก็บต้นไม้ภายใต้ key `trefleshop_favorites`; เพิ่ม ลบ และคงข้อมูลเมื่อรีเฟรช |
 | คำค้นและผลการค้นหา | `sessionStorage` | คงอยู่ภายใน session ของแท็บเบราว์เซอร์ |
 | ประวัติการเปิดดู | `sessionStorage` | บันทึก slug ชื่อ และเวลาที่เปิดดู; ล้างได้จากหน้า Viewing History |
 | รายการแนะนำ | หน่วยความจำ Express | Cache ภายในบริการเป็นเวลา 30 นาที |
 
-> **ขอบเขต Favorites:** ระบบระบุตัวตนด้วย browser session cookie เท่านั้น ไม่ใช่บัญชีผู้ใช้ จึงไม่ซิงก์ Favorites ระหว่างอุปกรณ์และเบราว์เซอร์ต่างกัน บน Vercel ต้องกำหนด `KV_REST_API_URL` และ `KV_REST_API_TOKEN`
+> **ขอบเขต Favorites:** ข้อมูลอยู่ในเบราว์เซอร์ของผู้ใช้ ใช้ชื่อต้นฉบับโดยไม่ซิงก์ข้ามเครื่องหรือเบราว์เซอร์ และอาจหายเมื่อผู้ใช้ล้างข้อมูลเว็บไซต์
 
 ## 3. การติดตั้งและเริ่มใช้งาน
 
@@ -99,10 +98,6 @@ Express มี endpoint ดังนี้
 | `GET` | `/api/plants/search?q=rose` | ค้นหาต้นไม้จากคำค้น `q`; ถ้าไม่มีคำค้นจะตอบสถานะ `400` |
 | `GET` | `/api/plants/recommendations` | ส่งรายการดอกไม้แนะนำ โดยรวบรวมผลจากหลายคำค้นและจัดอันดับความครบถ้วนของข้อมูลดูแล |
 | `GET` | `/api/plants/:slug` | ดึงรายละเอียดต้นไม้จาก slug |
-| `GET` | `/api/favorites` | ดึง Favorites ของ browser session จาก Redis/KV หรือ JSON file ใน local development |
-| `POST` | `/api/favorites` | เพิ่มหรืออัปเดตต้นไม้ใน Favorites ของ browser session |
-| `GET` | `/api/favorites/:slug` | ตรวจสอบว่าต้นไม้เป็น Favorite ของ browser session |
-| `DELETE` | `/api/favorites/:slug` | ลบต้นไม้จาก Favorites ของ browser session |
 | `GET` | `/api/test` | ตรวจสอบว่า Express API ทำงานอยู่ |
 
 ### การทำงานของ Backend
@@ -125,11 +120,9 @@ Express มี endpoint ดังนี้
 ├── backend/
 │   ├── index.js                    # สร้าง Express app และ Error Middleware
 │   ├── routes/
-│   │   ├── plantRoutes.js          # endpoints เกี่ยวกับต้นไม้
-│   │   └── favoriteRoutes.js       # endpoints เกี่ยวกับรายการโปรด
+│   │   └── plantRoutes.js          # endpoints เกี่ยวกับต้นไม้
 │   └── services/
-│       ├── trefleService.js        # ติดต่อ Trefle API และ cache คำแนะนำ
-│       └── favoriteService.js      # Redis/KV หรือ JSON file สำหรับ Favorites
+│       └── trefleService.js        # ติดต่อ Trefle API และ cache คำแนะนำ
 ├── frontend/
 │   ├── index.html
 │   ├── public/
@@ -249,13 +242,13 @@ flowchart TD
 | DSA | ไฟล์/จุดที่ใช้ | ข้อมูลที่ประมวลผลและผลต่อ UX | Complexity |
 |---|---|---|---|
 | Insertion Sort | `frontend/src/utils/plantUtils.js` เรียกใช้ใน `frontend/src/pages/HomePage.jsx` | เรียงผลการค้นหาต้นไม้ตาม `common_name` ก่อนแสดงผล ทำให้ผู้ใช้ไล่ดูชื่อ A–Z ได้ง่าย | Best case O(n), Average/Worst case O(n²); ฟังก์ชันคัดลอก array ก่อนเรียงจึงมีพื้นที่เพิ่ม O(n) |
-| การจัดเก็บตาม key/slug | `backend/services/favoriteService.js` | เก็บรายการ Favorites ตาม session ID และค้นหาต้นไม้ด้วย `slug`; Production ใช้ Redis/KV ส่วน local development ใช้ JSON file | อ่าน/เขียนผ่าน persistent store; ค้นหา slug ใน array มีเวลา O(n) ต่อรายการนั้น |
+| การจัดเก็บตาม key/slug | `frontend/src/utils/plantUtils.js` | เก็บ Favorites ใน `localStorage` ภายใต้ key `trefleshop_favorites` และค้นหาต้นไม้ด้วย `slug` | อ่าน/เขียนเป็น JSON ผ่าน Browser Storage; ค้นหา slug ใน array มีเวลา O(n) ต่อรายการนั้น |
 | Graph + BFS | `frontend/src/Graph.js` | Graph เก็บความสัมพันธ์ของหน้า; BFS ตรวจสอบการเข้าถึง node ใน Graph | BFS O(V + E) |
 
 ### เหตุผลที่เลือกใช้
 
 - **Insertion Sort:** เหมาะสำหรับอธิบายการเรียงข้อมูลในโปรเจกต์ และทำให้ผลค้นหามีลำดับ A–Z ก่อนแสดงแก่ผู้ใช้
-- **Key-based session storage:** ใช้ session ID แยก Favorites ของผู้ใช้งานตาม browser session และใช้ `slug` ระบุต้นไม้ภายในรายการ
+- **Key-based browser storage:** ใช้ key `trefleshop_favorites` เก็บ Favorites ในเบราว์เซอร์ของผู้ใช้และใช้ `slug` ระบุต้นไม้ภายในรายการ
 - **Graph:** แทนความสัมพันธ์การนำทางของแต่ละหน้าอย่างชัดเจน และสามารถตรวจสอบเส้นทางด้วย BFS ได้
 
 ## 9. ตารางส่วนร่วมของสมาชิก
@@ -298,20 +291,18 @@ flowchart TD
 | `recommendations` | รายการต้นไม้แนะนำ | `HomePage` | หลัง API คำแนะนำตอบกลับสำเร็จ | แสดงรายการแนะนำที่โหลดจาก Express |
 | `recommendationsLoading` | กำลังโหลดคำแนะนำหรือไม่ | `HomePage` | เริ่มต้นเป็น `true` และเปลี่ยนหลัง API เสร็จ | แสดง Loading ของส่วนแนะนำ |
 | `recommendationsError` | คำขอคำแนะนำผิดพลาดหรือไม่ | `HomePage` | เมื่อ API คำแนะนำล้มเหลว | แสดง Error ของส่วนแนะนำ |
-| `plants` | รายการโปรด | `FavoritesPage` | หลังโหลดจาก Express API และเมื่อลบรายการจากการ์ด | อัปเดตรายการที่เห็นโดยไม่โหลดทั้งหน้า |
-| `loading` | กำลังโหลดรายการโปรดหรือไม่ | `FavoritesPage` | ระหว่างอ่านข้อมูล client service | แสดง Loading |
-| `error` | โหลดรายการโปรดผิดพลาดหรือไม่ | `FavoritesPage` | เมื่อ client service ส่งค่าที่ไม่ถูกต้องหรือเกิดข้อผิดพลาด | แสดง Error |
+| `plants` | รายการโปรด | `FavoritesPage` | ตอนเริ่มต้นจาก `localStorage` และเมื่อลบรายการจากการ์ด | อัปเดตรายการที่เห็นโดยไม่โหลดทั้งหน้า |
 | `plants` | ประวัติการเปิดดู | `HistoryPage` | เริ่มจาก `sessionStorage` และเปลี่ยนเมื่อกด Clear History | แสดงประวัติล่าสุดและผลหลังล้าง |
 | `plant` | รายละเอียดต้นไม้ที่โหลดแล้ว | `PlantDetailPage` | เมื่อ slug เปลี่ยนและ API ตอบกลับ | แสดงข้อมูลต้นไม้ที่ตรงกับ URL |
 | `loading` | กำลังโหลดรายละเอียดหรือไม่ | `PlantDetailPage` | ก่อนและหลังเรียก API รายละเอียด | แสดง Loading |
 | `error` | โหลดรายละเอียดผิดพลาดหรือไม่ | `PlantDetailPage` | เมื่อไม่มี slug หรือ API ล้มเหลว | แสดง Error แทนรายละเอียดที่ไม่มี |
-| `favorite` | สถานะรายการโปรดของต้นไม้ | `PlantCard` | หลังตรวจสถานะจาก Express API และเมื่อเพิ่ม/ลบ | เปลี่ยนปุ่ม Save/Remove ตามสถานะที่เก็บไว้ |
+| `favorite` | สถานะรายการโปรดของต้นไม้ | `PlantCard` | หลังตรวจจาก `localStorage` และเมื่อเพิ่ม/ลบ | เปลี่ยนปุ่ม Save/Remove ตามสถานะที่เก็บไว้ |
 | `saving` | กำลังเพิ่มหรือลบรายการโปรดหรือไม่ | `PlantCard` | ระหว่างการทำงานของปุ่มรายการโปรด | แสดงสถานะกำลังทำงานและป้องกันการกดซ้ำ |
 | `imageFailed` | รูปภาพการ์ดโหลดไม่สำเร็จหรือไม่ | `PlantCard` | เมื่อรูปภาพเกิด `onError` | ซ่อนรูปที่โหลดไม่ได้ |
 | `favoriteError` | ข้อผิดพลาดเมื่อตรวจสถานะรายการโปรด | `PlantCard` | เมื่อการตรวจสอบสถานะเกิด error | แสดง feedback และป้องกันการกดปุ่มในสถานะไม่แน่นอน |
 | `favorite` | สถานะรายการโปรดในหน้ารายละเอียด | `PlantDetail` | หลังตรวจสถานะและเมื่อเพิ่ม/ลบ | อัปเดตปุ่มรายการโปรด |
-| `saving` | กำลังเพิ่มหรือลบรายการโปรดหรือไม่ | `PlantDetail` | ระหว่าง POST/DELETE | แสดงสถานะระหว่างบันทึกและป้องกันการกดซ้ำ |
-| `favoriteError` | การตรวจสอบสถานะรายการโปรดผิดพลาดหรือไม่ | `PlantDetail` | เมื่อการตรวจสอบสถานะ API/client ล้มเหลว | แสดงข้อความแจ้งผู้ใช้ |
+| `saving` | กำลังเพิ่มหรือลบรายการโปรดหรือไม่ | `PlantDetail` | ระหว่างบันทึกลง `localStorage` | แสดงสถานะระหว่างบันทึกและป้องกันการกดซ้ำ |
+| `favoriteError` | การเข้าถึง Favorites ใน Browser Storage ล้มเหลวหรือไม่ | `PlantDetail` | เมื่ออ่านหรือเขียน `localStorage` เกิด error | แสดงข้อความแจ้งผู้ใช้ |
 | `imageFailed` | รูปภาพในหน้า Plant Detail โหลดไม่สำเร็จหรือไม่ | `PlantDetail` | เมื่อเกิด `onError` และถูกรีเซ็ตเมื่อ `plant.slug` เปลี่ยน | ซ่อนรูปที่โหลดไม่ได้และใช้สถานะใหม่สำหรับต้นไม้ถัดไป |
 
 > `activeSearchId` ใน `HomePage` และ `recordedSlug` ใน `PlantDetailPage` เป็น `useRef` ไม่ใช่ state จึงไม่อยู่ในตาราง useState
@@ -321,7 +312,7 @@ flowchart TD
 | Component | Effect ทำอะไร | Dependency array | ทำงานตอนไหน |
 |---|---|---|---|
 | `HomePage` | ตั้งชื่อแท็บและเรียก API โหลดรายการแนะนำ พร้อม cleanup flag ป้องกัน setState หลังออกจากหน้า | `[]` | เมื่อ component mount; cleanup ตอน unmount |
-| `FavoritesPage` | ตั้งชื่อแท็บและโหลดรายการโปรดผ่าน Express API พร้อมจัดการ loading/error | `[]` | เมื่อ mount; cleanup ตอน unmount |
+| `FavoritesPage` | ตั้งชื่อแท็บและโหลดรายการโปรดจาก `localStorage` | `[]` | เมื่อ mount |
 | `HistoryPage` | ตั้งชื่อแท็บของหน้าประวัติ | `[]` | เมื่อ mount |
 | `PlantDetailPage` | ตั้งชื่อแท็บ โหลดรายละเอียดตาม slug และบันทึกประวัติเมื่อโหลดสำเร็จ | `[slug]` | เมื่อ mount และเมื่อ slug เปลี่ยน; cleanup ป้องกันอัปเดตจากคำขอเก่า |
 | `PlantCard` | ตรวจสอบสถานะรายการโปรดของต้นไม้; ถ้ามี `onRemove` จะกำหนดสถานะเป็นรายการโปรดโดยไม่เรียกตรวจ API | `[plant.slug, Boolean(onRemove)]` | เมื่อ slug หรือโหมดการ์ดเปลี่ยน |
