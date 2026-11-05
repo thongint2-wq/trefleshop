@@ -20,7 +20,10 @@ app.use("/api/favorites", favoriteRoutes);
 
 // # Endpoint สำหรับตรวจสอบว่าเซิร์ฟเวอร์พร้อมทำงานหรือไม่
 app.get("/api/test", (req, res) => {
-    res.json({ message: "Trefle Plant Shop API is working!" });
+    res.json({
+        message: "Trefle Plant Shop API is working!",
+        trefleConfigured: Boolean(process.env.TREFLE_TOKEN)
+    });
 });
 
 app.use("/api", (req, res) => {

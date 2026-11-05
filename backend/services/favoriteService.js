@@ -5,6 +5,7 @@ const path = require("path");
 const SESSION_COOKIE = "trefle_favorites_session";
 const FAVORITES_DIRECTORY = path.join(__dirname, "../data/favorites");
 const favoritesByOwner = new Map();
+<<<<<<< HEAD
 
 function getStorageKey(ownerId) {
     return `trefle:favorites:${ownerId}`;
@@ -19,6 +20,9 @@ function parseFavorites(value) {
     }
 }
 
+=======
+
+>>>>>>> d72e793aa09b43124b39b5f01dd07bec7897bcef
 async function readFavorites(ownerId) {
     if (favoritesByOwner.has(ownerId)) {
         return favoritesByOwner.get(ownerId);
@@ -29,10 +33,16 @@ async function readFavorites(ownerId) {
     let plants = [];
 
     if (kvUrl && kvToken) {
+<<<<<<< HEAD
         const response = await fetch(
             `${kvUrl.replace(/\/$/, "")}/get/${encodeURIComponent(getStorageKey(ownerId))}`,
             { headers: { Authorization: `Bearer ${kvToken}` } }
         );
+=======
+        const response = await fetch(`${kvUrl.replace(/\/$/, "")}/get/${encodeURIComponent(getStorageKey(ownerId))}`, {
+            headers: { Authorization: `Bearer ${kvToken}` }
+        });
+>>>>>>> d72e793aa09b43124b39b5f01dd07bec7897bcef
         if (!response.ok) {
             throw new Error(`Favorite storage returned ${response.status}`);
         }
@@ -42,10 +52,14 @@ async function readFavorites(ownerId) {
         }
     } else {
         try {
+<<<<<<< HEAD
             const file = await fs.readFile(
                 path.join(FAVORITES_DIRECTORY, `${ownerId}.json`),
                 "utf8"
             );
+=======
+            const file = await fs.readFile(path.join(FAVORITES_DIRECTORY, `${ownerId}.json`), "utf8");
+>>>>>>> d72e793aa09b43124b39b5f01dd07bec7897bcef
             plants = parseFavorites(file);
         } catch (error) {
             if (error.code !== "ENOENT") throw error;
@@ -62,6 +76,7 @@ async function writeFavorites(ownerId, plants) {
     const serializedPlants = JSON.stringify(plants);
 
     if (kvUrl && kvToken) {
+<<<<<<< HEAD
         const response = await fetch(
             `${kvUrl.replace(/\/$/, "")}/set/${encodeURIComponent(getStorageKey(ownerId))}/${encodeURIComponent(serializedPlants)}`,
             {
@@ -69,11 +84,18 @@ async function writeFavorites(ownerId, plants) {
                 headers: { Authorization: `Bearer ${kvToken}` }
             }
         );
+=======
+        const response = await fetch(`${kvUrl.replace(/\/$/, "")}/set/${encodeURIComponent(getStorageKey(ownerId))}/${encodeURIComponent(serializedPlants)}`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${kvToken}` }
+        });
+>>>>>>> d72e793aa09b43124b39b5f01dd07bec7897bcef
         if (!response.ok) {
             throw new Error(`Favorite storage returned ${response.status}`);
         }
     } else {
         await fs.mkdir(FAVORITES_DIRECTORY, { recursive: true });
+<<<<<<< HEAD
         await fs.writeFile(
             path.join(FAVORITES_DIRECTORY, `${ownerId}.json`),
             serializedPlants,
@@ -82,6 +104,25 @@ async function writeFavorites(ownerId, plants) {
     }
 
     favoritesByOwner.set(ownerId, [...plants]);
+=======
+        await fs.writeFile(path.join(FAVORITES_DIRECTORY, `${ownerId}.json`), serializedPlants, "utf8");
+    }
+
+    favoritesByOwner.set(ownerId, [...plants]);
+}
+
+function getStorageKey(ownerId) {
+    return `trefle:favorites:${ownerId}`;
+}
+
+function parseFavorites(value) {
+    try {
+        const plants = JSON.parse(value);
+        return Array.isArray(plants) ? plants : [];
+    } catch {
+        return [];
+    }
+>>>>>>> d72e793aa09b43124b39b5f01dd07bec7897bcef
 }
 
 function getOwnerId(req, res) {
