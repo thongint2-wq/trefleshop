@@ -4,75 +4,73 @@ const path = require("path");
 
 const SESSION_COOKIE = "trefle_favorites_session";
 const FAVORITES_DIRECTORY = path.join(__dirname, "../data/favorites");
-const memoryFavorites = new Map();
-
-function getStorageKey(ownerId) {
-    return `trefle:favorites:${ownerId}`;
-}
+const favoritesByOwner = new Map();
 
 async function readFavorites(ownerId) {
+    if (favoritesByOwner.has(ownerId)) {
+        return favoritesByOwner.get(ownerId);
+    }
+
     const kvUrl = process.env.KV_REST_API_URL;
     const kvToken = process.env.KV_REST_API_TOKEN;
+    let plants = [];
 
     if (kvUrl && kvToken) {
-        const response = await fetch(
-            `${kvUrl.replace(/\/$/, "")}/get/${encodeURIComponent(getStorageKey(ownerId))}`,
-            { headers: { Authorization: `Bearer ${kvToken}` } }
-        );
+        const response = await fetch(`${kvUrl.replace(/\/$/, "")}/get/${encodeURIComponent(getStorageKey(ownerId))}`, {
+            headers: { Authorization: `Bearer ${kvToken}` }
+        });
         if (!response.ok) {
             throw new Error(`Favorite storage returned ${response.status}`);
         }
         const result = await response.json();
-        if (!result.result) return [];
+        if (typeof result.result === "string") {
+            plants = parseFavorites(result.result);
+        }
+    } else {
         try {
-            const plants = JSON.parse(result.result);
-            return Array.isArray(plants) ? plants : [];
-        } catch {
-            return [];
+            const file = await fs.readFile(path.join(FAVORITES_DIRECTORY, `${ownerId}.json`), "utf8");
+            plants = parseFavorites(file);
+        } catch (error) {
+            if (error.code !== "ENOENT") throw error;
         }
     }
 
-    if (memoryFavorites.has(ownerId)) {
-        return memoryFavorites.get(ownerId);
-    }
-
-    try {
-        const data = await fs.readFile(path.join(FAVORITES_DIRECTORY, `${ownerId}.json`), "utf8");
-        const plants = JSON.parse(data);
-        const savedPlants = Array.isArray(plants) ? plants : [];
-        memoryFavorites.set(ownerId, savedPlants);
-        return savedPlants;
-    } catch (error) {
-        if (error.code === "ENOENT") {
-            memoryFavorites.set(ownerId, []);
-            return [];
-        }
-        throw error;
-    }
+    favoritesByOwner.set(ownerId, plants);
+    return plants;
 }
 
 async function writeFavorites(ownerId, plants) {
     const kvUrl = process.env.KV_REST_API_URL;
     const kvToken = process.env.KV_REST_API_TOKEN;
+    const serializedPlants = JSON.stringify(plants);
 
     if (kvUrl && kvToken) {
-        const response = await fetch(
-            `${kvUrl.replace(/\/$/, "")}/set/${encodeURIComponent(getStorageKey(ownerId))}/${encodeURIComponent(JSON.stringify(plants))}`,
-            { headers: { Authorization: `Bearer ${kvToken}` } }
-        );
+        const response = await fetch(`${kvUrl.replace(/\/$/, "")}/set/${encodeURIComponent(getStorageKey(ownerId))}/${encodeURIComponent(serializedPlants)}`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${kvToken}` }
+        });
         if (!response.ok) {
             throw new Error(`Favorite storage returned ${response.status}`);
         }
     } else {
         await fs.mkdir(FAVORITES_DIRECTORY, { recursive: true });
-        await fs.writeFile(
-            path.join(FAVORITES_DIRECTORY, `${ownerId}.json`),
-            JSON.stringify(plants, null, 2),
-            "utf8"
-        );
+        await fs.writeFile(path.join(FAVORITES_DIRECTORY, `${ownerId}.json`), serializedPlants, "utf8");
     }
 
-    memoryFavorites.set(ownerId, plants);
+    favoritesByOwner.set(ownerId, [...plants]);
+}
+
+function getStorageKey(ownerId) {
+    return `trefle:favorites:${ownerId}`;
+}
+
+function parseFavorites(value) {
+    try {
+        const plants = JSON.parse(value);
+        return Array.isArray(plants) ? plants : [];
+    } catch {
+        return [];
+    }
 }
 
 function getOwnerId(req, res) {
