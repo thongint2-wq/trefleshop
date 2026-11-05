@@ -1,69 +1,17 @@
-const fs = require("fs");
-const path = require("path");
 const crypto = require("crypto");
 
-const dataDirectory = path.join(__dirname, "../data");
-const favoritesFile = path.join(dataDirectory, "favorites.json");
 const SESSION_COOKIE = "trefle_favorites_session";
 
-function isRedisConfigured() {
-    return Boolean(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+// # เก็บรายการโปรดใน Array ของหน่วยความจำของ Node.js
+// ข้อมูลจะหายเมื่อเซิร์ฟเวอร์ restart หรือ serverless instance ถูกสร้างใหม่
+const favorites = [];
+
+function readFavorites(ownerId) {
+    return favorites;
 }
 
-function readLocalStore() {
-    if (!fs.existsSync(favoritesFile)) return {};
-
-    const stored = JSON.parse(fs.readFileSync(favoritesFile, "utf8"));
-    return stored && typeof stored === "object" && !Array.isArray(stored) ? stored : {};
-}
-
-function writeLocalStore(store) {
-    fs.mkdirSync(dataDirectory, { recursive: true });
-    const temporaryFile = `${favoritesFile}.tmp`;
-    fs.writeFileSync(temporaryFile, JSON.stringify(store, null, 2), "utf8");
-    fs.renameSync(temporaryFile, favoritesFile);
-}
-
-async function redisCommand(...args) {
-    if (!isRedisConfigured()) {
-        throw new Error("Persistent favorites storage is not configured");
-    }
-
-    const response = await fetch(`${process.env.KV_REST_API_URL}/${args.map(encodeURIComponent).join("/")}`, {
-        headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` }
-    });
-
-    if (!response.ok) {
-        throw new Error(`Persistent favorites storage request failed (${response.status})`);
-    }
-
-    const result = await response.json();
-    return result.result;
-}
-
-function storageKey(ownerId) {
-    return `trefle:favorites:${ownerId}`;
-}
-
-async function readFavorites(ownerId) {
-    if (isRedisConfigured()) {
-        const stored = await redisCommand("GET", storageKey(ownerId));
-        const plants = typeof stored === "string" ? JSON.parse(stored) : [];
-        return Array.isArray(plants) ? plants : [];
-    }
-
-    return Array.isArray(readLocalStore()[ownerId]) ? readLocalStore()[ownerId] : [];
-}
-
-async function writeFavorites(ownerId, plants) {
-    if (isRedisConfigured()) {
-        await redisCommand("SET", storageKey(ownerId), JSON.stringify(plants));
-        return;
-    }
-
-    const store = readLocalStore();
-    store[ownerId] = plants;
-    writeLocalStore(store);
+function writeFavorites(ownerId, plants) {
+    favorites.splice(0, favorites.length, ...plants);
 }
 
 function getOwnerId(req, res) {
@@ -72,7 +20,13 @@ function getOwnerId(req, res) {
             .split(";")
             .map(cookie => cookie.trim().split("="))
             .filter(parts => parts.length === 2)
-            .map(([key, value]) => [key.trim(), decodeURIComponent(value)])
+            .map(([key, value]) => {
+                try {
+                    return [key.trim(), decodeURIComponent(value)];
+                } catch {
+                    return [key.trim(), ""];
+                }
+            })
     );
 
     let ownerId = cookies[SESSION_COOKIE];
@@ -90,18 +44,18 @@ function getOwnerId(req, res) {
 }
 
 async function addFavorite(ownerId, plant) {
-    const plants = await readFavorites(ownerId);
+    const plants = readFavorites(ownerId);
     const nextPlants = plants.some(savedPlant => savedPlant.slug === plant.slug)
         ? plants.map(savedPlant => savedPlant.slug === plant.slug ? plant : savedPlant)
         : [...plants, plant];
 
-    await writeFavorites(ownerId, nextPlants);
+    writeFavorites(ownerId, nextPlants);
     return plant;
 }
 
 async function removeFavorite(ownerId, slug) {
-    const plants = await readFavorites(ownerId);
-    await writeFavorites(ownerId, plants.filter(plant => plant.slug !== slug));
+    const plants = readFavorites(ownerId);
+    writeFavorites(ownerId, plants.filter(plant => plant.slug !== slug));
 }
 
 async function getFavorites(ownerId) {
@@ -109,7 +63,7 @@ async function getFavorites(ownerId) {
 }
 
 async function isFavorite(ownerId, slug) {
-    const plants = await readFavorites(ownerId);
+    const plants = readFavorites(ownerId);
     return plants.some(plant => plant.slug === slug);
 }
 
